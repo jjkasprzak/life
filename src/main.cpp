@@ -2,7 +2,8 @@
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
+    auto window = std::make_unique<sf::RenderWindow>(sf::VideoMode(200, 200), "SFML works!");
+    //itd...
     sf::CircleShape shape(100.f);
     shape.setFillColor(sf::Color::Green);
 
