@@ -11,6 +11,7 @@ git clone --recurse-submodules git@github.com:jjkasprzak/life.git
 ```
 Build the project using CMake
 ```
+mkdir life/build
 cd life/build
 cmake ..
 cmake --build .
