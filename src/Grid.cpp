@@ -38,49 +38,41 @@ void Grid::updateGrid() const
 	float xlim = bounds_.left + bounds_.width;
 	float ylim = bounds_.top + bounds_.height;
 	ticks_.clear();
-	ticks_.setPrimitiveType(sf::PrimitiveType::Triangles);
+	ticks_.setPrimitiveType(sf::PrimitiveType::Lines);
 
 	suppTicks_.clear();
-	suppTicks_.setPrimitiveType(sf::Lines);
+	suppTicks_.setPrimitiveType(sf::PrimitiveType::Lines);
 	int suppCount = scaleFactor_ == 2 ? 4 : 5;
 
 	xLabels_.clear();
 	yLabels_.clear();
 
-	float width = unit * 0.007f;
+	sf::Color suppTickColor = gridColor_;
+	suppTickColor.a = 64;
+
 	while (x < xlim)
 	{
-		ticks_.append(sf::Vertex(sf::Vector2f(x - width, bounds_.top), gridColor_));
-		ticks_.append(sf::Vertex(sf::Vector2f(x + width, bounds_.top), gridColor_));
-		ticks_.append(sf::Vertex(sf::Vector2f(x - width, ylim), gridColor_));
-
-		ticks_.append(sf::Vertex(sf::Vector2f(x - width, ylim), gridColor_));
-		ticks_.append(sf::Vertex(sf::Vector2f(x + width, ylim), gridColor_));
-		ticks_.append(sf::Vertex(sf::Vector2f(x + width, bounds_.top), gridColor_));
+		ticks_.append(sf::Vertex(sf::Vector2f(x, bounds_.top), gridColor_));
+		ticks_.append(sf::Vertex(sf::Vector2f(x, ylim), gridColor_));
 
 		for (size_t i = 0; i < suppCount; i++)
 		{
 			float tmpx = x + unit * (i + 1) / suppCount;
-			suppTicks_.append(sf::Vertex(sf::Vector2f(tmpx, ylim), gridColor_));
-			suppTicks_.append(sf::Vertex(sf::Vector2f(tmpx, bounds_.top), gridColor_));
+			suppTicks_.append(sf::Vertex(sf::Vector2f(tmpx, ylim), suppTickColor));
+			suppTicks_.append(sf::Vertex(sf::Vector2f(tmpx, bounds_.top), suppTickColor));
 		}
 		x += unit;
 	}
 	while (y < ylim)
 	{
-		ticks_.append(sf::Vertex(sf::Vector2f(bounds_.left, y - width), gridColor_));
-		ticks_.append(sf::Vertex(sf::Vector2f(bounds_.left, y + width), gridColor_));
-		ticks_.append(sf::Vertex(sf::Vector2f(xlim, y - width), gridColor_));
-
-		ticks_.append(sf::Vertex(sf::Vector2f(xlim, y - width), gridColor_));
-		ticks_.append(sf::Vertex(sf::Vector2f(xlim, y + width), gridColor_));
-		ticks_.append(sf::Vertex(sf::Vector2f(bounds_.left, y + width), gridColor_));
+		ticks_.append(sf::Vertex(sf::Vector2f(bounds_.left, y), gridColor_));
+		ticks_.append(sf::Vertex(sf::Vector2f(xlim, y), gridColor_));
 
 		for (size_t i = 0; i < suppCount; i++)
 		{
 			float tmpy = y + unit * (i + 1) / suppCount;
-			suppTicks_.append(sf::Vertex(sf::Vector2f(xlim, tmpy), gridColor_));
-			suppTicks_.append(sf::Vertex(sf::Vector2f(bounds_.left, tmpy), gridColor_));
+			suppTicks_.append(sf::Vertex(sf::Vector2f(xlim, tmpy), suppTickColor));
+			suppTicks_.append(sf::Vertex(sf::Vector2f(bounds_.left, tmpy), suppTickColor));
 		}
 		y += unit;
 	}
