@@ -1,5 +1,7 @@
 #include "Grid.h"
 
+const sf::FloatRect Grid::supportedArea(sf::Vector2f(-1e36f, -1e36f), sf::Vector2f(2e36f, 2e36f));
+
 void Grid::draw(sf::RenderTarget& target, const sf::RenderStates& states) const
 {
 	sf::Vector2f center = target.getView().getCenter();
@@ -12,13 +14,13 @@ void Grid::draw(sf::RenderTarget& target, const sf::RenderStates& states) const
 	valid_ = valid_ && bounds_.contains(ul) && bounds_.contains(br);
 	if (!valid_)
 	{
-		bounds_ = sf::FloatRect(ul - diagonal, diagonal.cwiseMul(sf::Vector2f(3.f, 3.f)));
+		bounds_ = supportedArea.findIntersection(sf::FloatRect(ul - diagonal, diagonal.cwiseMul(sf::Vector2f(3.f, 3.f)))).value();
 		updateGrid();
 	}
 
 	target.draw(background_, states);
-	target.draw(ticks_, states);
-	target.draw(suppTicks_, states);
+	target.draw(lines_, states);
+	target.draw(suppLines_, states);
 	if (showLabels_)
 	{
 		for (const sf::Text& e : this->xLabels_)
@@ -37,11 +39,11 @@ void Grid::updateGrid() const
 
 	float xlim = bounds_.left + bounds_.width;
 	float ylim = bounds_.top + bounds_.height;
-	ticks_.clear();
-	ticks_.setPrimitiveType(sf::PrimitiveType::Lines);
+	lines_.clear();
+	lines_.setPrimitiveType(sf::PrimitiveType::Lines);
 
-	suppTicks_.clear();
-	suppTicks_.setPrimitiveType(sf::PrimitiveType::Lines);
+	suppLines_.clear();
+	suppLines_.setPrimitiveType(sf::PrimitiveType::Lines);
 	int suppCount = scaleFactor_ == 2 ? 4 : 5;
 
 	xLabels_.clear();
@@ -52,27 +54,27 @@ void Grid::updateGrid() const
 
 	while (x < xlim)
 	{
-		ticks_.append(sf::Vertex(sf::Vector2f(x, bounds_.top), gridColor_));
-		ticks_.append(sf::Vertex(sf::Vector2f(x, ylim), gridColor_));
+		lines_.append(sf::Vertex(sf::Vector2f(x, bounds_.top), gridColor_));
+		lines_.append(sf::Vertex(sf::Vector2f(x, ylim), gridColor_));
 
 		for (size_t i = 0; i < suppCount; i++)
 		{
 			float tmpx = x + unit * (i + 1) / suppCount;
-			suppTicks_.append(sf::Vertex(sf::Vector2f(tmpx, ylim), suppTickColor));
-			suppTicks_.append(sf::Vertex(sf::Vector2f(tmpx, bounds_.top), suppTickColor));
+			suppLines_.append(sf::Vertex(sf::Vector2f(tmpx, ylim), suppTickColor));
+			suppLines_.append(sf::Vertex(sf::Vector2f(tmpx, bounds_.top), suppTickColor));
 		}
 		x += unit;
 	}
 	while (y < ylim)
 	{
-		ticks_.append(sf::Vertex(sf::Vector2f(bounds_.left, y), gridColor_));
-		ticks_.append(sf::Vertex(sf::Vector2f(xlim, y), gridColor_));
+		lines_.append(sf::Vertex(sf::Vector2f(bounds_.left, y), gridColor_));
+		lines_.append(sf::Vertex(sf::Vector2f(xlim, y), gridColor_));
 
 		for (size_t i = 0; i < suppCount; i++)
 		{
 			float tmpy = y + unit * (i + 1) / suppCount;
-			suppTicks_.append(sf::Vertex(sf::Vector2f(xlim, tmpy), suppTickColor));
-			suppTicks_.append(sf::Vertex(sf::Vector2f(bounds_.left, tmpy), suppTickColor));
+			suppLines_.append(sf::Vertex(sf::Vector2f(xlim, tmpy), suppTickColor));
+			suppLines_.append(sf::Vertex(sf::Vector2f(bounds_.left, tmpy), suppTickColor));
 		}
 		y += unit;
 	}
@@ -83,8 +85,7 @@ void Grid::updateGrid() const
 
 void Grid::updateScale(const sf::Vector2f& diagonal) const
 {
-	float area = diagonal.dot(diagonal);
-	float idealUnit = std::sqrtf(area / numberOfCells_);
+	float idealUnit = std::max(diagonal.x, diagonal.y) / desiredNumOfGridLines_;
 	int exponent = static_cast<int>(std::log10f(idealUnit));
 	float idealFactor = idealUnit / std::powf(10, exponent);
 

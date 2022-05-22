@@ -9,27 +9,25 @@
 class Grid : public sf::Drawable
 {
 public:
-	Grid(size_t numberOfCells = 64, bool showLabels = true) noexcept
-		:numberOfCells_(numberOfCells)
+	Grid(size_t desiredNumOfGridLines = 12, bool showLabels = true) noexcept
+		:desiredNumOfGridLines_(desiredNumOfGridLines)
 		,showLabels_(showLabels)
 		,gridColor_(sf::Color::White)
 		,valid_(false)
-		,scaleFactor_(0)
+		,scaleFactor_(1)
 		,scaleExponent_(0)
 	{
 		background_.setFillColor(sf::Color::Black);
 	}
 
-	void setNumberOfCells(size_t numberOfCells)
+	void setDesiredNumOfGridLines(size_t nogl)
 	{
-		if (numberOfCells_ != numberOfCells)
-			valid_ = false;
-		numberOfCells_ = numberOfCells;
+		desiredNumOfGridLines_ = nogl;
 	}
 
-	void setLabelsVisibility(bool showScale)
+	void setLabelVisibility(bool showLabels)
 	{
-		showLabels_ = showScale;
+		showLabels_ = showLabels;
 	}
 
 	void setBackgroundColor(const sf::Color& color)
@@ -42,7 +40,7 @@ public:
 		gridColor_ = color;
 	}
 
-	bool getLabelsVisibility() const
+	bool getLabelVisibility() const
 	{
 		return showLabels_;
 	}
@@ -54,7 +52,7 @@ public:
 
 	size_t getNumberOfCells() const
 	{
-		return numberOfCells_;
+		return desiredNumOfGridLines_;
 	}
 
 	sf::Color setGridColor() const
@@ -66,10 +64,12 @@ protected:
 	virtual void draw(sf::RenderTarget& target, const sf::RenderStates& states) const override;
 	
 private:
+	static const sf::FloatRect supportedArea;
+
 	void updateGrid() const;
 	void updateScale(const sf::Vector2f& diagonal) const;
 
-	size_t numberOfCells_;
+	size_t desiredNumOfGridLines_;
 	bool showLabels_;
 	sf::Color gridColor_;
 
@@ -78,6 +78,6 @@ private:
 	mutable int scaleExponent_;
 	mutable sf::FloatRect bounds_;
 	mutable sf::RectangleShape background_;
-	mutable sf::VertexArray ticks_, suppTicks_;
+	mutable sf::VertexArray lines_, suppLines_;
 	mutable std::vector<sf::Text> xLabels_, yLabels_;
 };
