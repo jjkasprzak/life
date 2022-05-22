@@ -1,27 +1,29 @@
 #include <SFML/Graphics.hpp>
+#include "Grid.h"
+#include "WindowViewController.h"
+#include "memory"
 
 int main()
 {
-    sf::RenderWindow* windowp = new sf::RenderWindow(sf::VideoMode(200, 200), "SFML works!");
-    sf::RenderWindow& window = *windowp;
 
-    sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
+    auto window = std::make_shared<sf::RenderWindow>(sf::VideoMode(800, 800), "SFML works!");
+    Grid grid;
+    WindowViewController wvc(window);
 
-    while (window.isOpen())
+    while (window->isOpen())
     {
         sf::Event event;
-        while (window.pollEvent(event))
+        while (window->pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
-                window.close();
+                window->close();
+            wvc.handleInput(event);
         }
 
-        window.clear();
-        window.draw(shape);
-        window.display();
+        window->clear();
+        window->draw(grid);
+        window->display();
     }
-    delete windowp;
 
     return 0;
 }
