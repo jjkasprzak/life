@@ -23,10 +23,20 @@ void Grid::draw(sf::RenderTarget& target, const sf::RenderStates& states) const
 	target.draw(suppLines_, states);
 	if (showLabels_)
 	{
-		for (const sf::Text& e : this->xLabels_)
+		float txtScale = std::max(diagonal.x, diagonal.y) * .007 / desiredNumOfGridLines_;
+		float x = ul.x, y = ul.y;
+		for (sf::Text& e : this->xLabels_)
+		{
+			e.setScale(sf::Vector2f(txtScale, txtScale));
+			e.setPosition({ e.getPosition().x, y});
 			target.draw(e, states);
-		for (const sf::Text& e : this->yLabels_)
+		}
+		for (sf::Text& e : this->yLabels_)
+		{
+			e.setScale(sf::Vector2f(txtScale, txtScale));
+			e.setPosition({ x, e.getPosition().y});
 			target.draw(e, states);
+		}
 	}
 }
 
@@ -63,6 +73,14 @@ void Grid::updateGrid() const
 			suppLines_.append(sf::Vertex(sf::Vector2f(tmpx, ylim), suppTickColor));
 			suppLines_.append(sf::Vertex(sf::Vector2f(tmpx, bounds_.top), suppTickColor));
 		}
+		sf::Text label;
+
+
+		label.setString(":^)");
+		label.setPosition(sf::Vector2f(x, ylim));
+		label.setFont(*font_);
+		xLabels_.emplace_back(label);
+
 		x += unit;
 	}
 	while (y < ylim)
@@ -76,6 +94,13 @@ void Grid::updateGrid() const
 			suppLines_.append(sf::Vertex(sf::Vector2f(xlim, tmpy), suppTickColor));
 			suppLines_.append(sf::Vertex(sf::Vector2f(bounds_.left, tmpy), suppTickColor));
 		}
+		sf::Text label;
+
+		label.setString(":^)");
+		label.setPosition(sf::Vector2f(xlim, y));
+		label.setFont(*font_);
+		yLabels_.emplace_back(label);
+
 		y += unit;
 	}
 	background_.setPosition(bounds_.getPosition());
@@ -86,7 +111,10 @@ void Grid::updateGrid() const
 void Grid::updateScale(const sf::Vector2f& diagonal) const
 {
 	float idealUnit = std::max(diagonal.x, diagonal.y) / desiredNumOfGridLines_;
-	int exponent = static_cast<int>(std::log10f(idealUnit));
+	float floatExp = std::log10f(idealUnit);
+	int exponent = (int)floatExp;
+	if (floatExp < 0)
+		--exponent;
 	float idealFactor = idealUnit / std::powf(10, exponent);
 
 	unsigned int candidateFactor = 10;

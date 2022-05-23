@@ -2,12 +2,20 @@
 #include "Grid.h"
 #include "WindowViewController.h"
 #include "memory"
+#include <filesystem>
 
 int main()
 {
+    auto lato = std::make_shared<sf::Font>();
+
+    if (!lato->loadFromFile("fonts/Lato-Regular.ttf"))
+    {
+        throw std::exception("Failed to load a font");
+    }
 
     auto window = std::make_shared<sf::RenderWindow>(sf::VideoMode(800, 800), "SFML works!");
     Grid grid;
+    grid.setFont(lato);
     WindowViewController wvc(window);
 
     while (window->isOpen())

@@ -4,7 +4,7 @@
 #include <vector>
 #include <cmath>
 #include <array>
-#include <stdio.h>
+#include <string>
 
 class Grid : public sf::Drawable
 {
@@ -40,6 +40,11 @@ public:
 		gridColor_ = color;
 	}
 
+	void setFont(std::shared_ptr<sf::Font> font)
+	{
+		font_ = font;
+	}
+
 	bool getLabelVisibility() const
 	{
 		return showLabels_;
@@ -72,6 +77,7 @@ private:
 	size_t desiredNumOfGridLines_;
 	bool showLabels_;
 	sf::Color gridColor_;
+	std::shared_ptr<sf::Font> font_;
 
 	mutable bool valid_;
 	mutable unsigned int scaleFactor_;
